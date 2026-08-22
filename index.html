@@ -1,6 +1,317 @@
-$ wc -c /home/user/-Qiratan/dashboard/index.html /home/user/-Qiratan/dashboard/manifest.webmanifest /home/user/-Qiratan/dashboard/sw.js
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0F2E29">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>قيراطان — التحليلات</title>
+<style>
+:root{
+  --bg:#08201D; --card:#0E2E29; --card2:#123832; --line:#1C4B44;
+  --ink:#EAF3F0; --muted:#8DAEA7; --gold:#E8C57C; --goldDim:#A98F55;
+  --ok:#43C08A; --okBg:#0E2E29; --warn:#E4B04A; --bad:#E4646B;
+  --blue:#5FB8DC; --violet:#9E8CE0; --rose:#E08AA6;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.65;
+  padding-bottom:env(safe-area-inset-bottom)}
 
-18758 /home/user/-Qiratan/dashboard/index.html
-  673 /home/user/-Qiratan/dashboard/manifest.webmanifest
- 1284 /home/user/-Qiratan/dashboard/sw.js
-20715 total
+/* ── الرأس ─────────────────────────────────────────── */
+header{position:sticky;top:0;z-index:9;padding:14px 16px;
+  padding-top:calc(14px + env(safe-area-inset-top));
+  background:linear-gradient(150deg,#145046,#0A2A25);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:12px}
+header img{width:38px;height:38px;border-radius:10px}
+header h1{margin:0;font-size:17px;color:var(--gold)}
+header small{display:block;color:#93B6AE;font-size:11.5px;font-weight:400}
+header button{margin-inline-start:auto;background:rgba(255,255,255,.09);
+  border:1px solid var(--line);color:var(--gold);border-radius:10px;
+  width:38px;height:38px;font-size:17px;cursor:pointer}
+
+main{max-width:960px;margin:0 auto;padding:14px}
+
+/* ── الأقسام ───────────────────────────────────────── */
+section{margin-bottom:22px}
+h2{font-size:15px;margin:0 0 3px;display:flex;align-items:center;gap:8px}
+h2 .bar{width:4px;height:17px;border-radius:3px;background:var(--gold)}
+.why{font-size:12.5px;color:var(--muted);margin:0 0 12px;padding-inline-start:12px}
+
+/* ── البطاقات ──────────────────────────────────────── */
+.grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.c{background:var(--card);border:1px solid var(--line);border-radius:15px;
+  padding:13px;position:relative;overflow:hidden}
+.c::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--gold)}
+.c.ok::before{background:var(--ok)} .c.warn::before{background:var(--warn)}
+.c.bad::before{background:var(--bad)} .c.blue::before{background:var(--blue)}
+.c.violet::before{background:var(--violet)} .c.rose::before{background:var(--rose)}
+.c .n{font-size:27px;font-weight:700;line-height:1.15;letter-spacing:-.5px}
+.c.ok .n{color:var(--ok)} .c.warn .n{color:var(--warn)} .c.bad .n{color:var(--bad)}
+.c.blue .n{color:var(--blue)} .c.violet .n{color:var(--violet)} .c.rose .n{color:var(--rose)}
+.c .l{font-size:12.5px;color:var(--muted);margin-top:1px}
+.c .h{font-size:11.5px;margin-top:8px;padding-top:7px;
+  border-top:1px dashed var(--line);color:var(--goldDim)}
+.hero{grid-column:1/-1;background:linear-gradient(145deg,#154A41,#0B2C27);
+  border-color:#1F5F55;padding:20px}
+.hero .n{font-size:52px;color:var(--gold)}
+.hero .l{font-size:14px;color:#BFDCD5}
+
+/* ── شريط نِسَب ────────────────────────────────────── */
+.stack{display:flex;height:13px;border-radius:7px;overflow:hidden;
+  background:#0A2622;margin:12px 0 8px}
+.stack i{display:block}
+.keys{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.keys b{color:var(--ink);font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-inline-end:5px}
+
+/* ── الجداول ───────────────────────────────────────── */
+.wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card)}
+th,td{padding:9px 11px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:var(--card2);color:var(--goldDim);font-size:12px}
+tr:last-child td{border-bottom:none}
+.mini{height:7px;border-radius:4px;background:#0A2622;overflow:hidden;min-width:56px}
+.mini i{display:block;height:100%;background:var(--gold)}
+
+/* ── الرسم ─────────────────────────────────────────── */
+.chart{background:var(--card);border:1px solid var(--line);
+  border-radius:15px;padding:12px 6px 6px}
+svg{display:block;width:100%;height:auto}
+
+.note{background:var(--card2);border-inline-start:3px solid var(--gold);
+  border-radius:11px;padding:11px 13px;margin-top:11px;font-size:13px}
+.note.bad{border-inline-start-color:var(--bad)}
+.note.ok{border-inline-start-color:var(--ok)}
+
+/* ── الدخول ────────────────────────────────────────── */
+.setup{max-width:440px;margin:8vh auto;padding:24px}
+.setup img{width:74px;height:74px;border-radius:18px;display:block;margin:0 auto 14px}
+.setup h1{text-align:center;color:var(--gold);font-size:20px;margin:0 0 4px}
+.setup p{text-align:center;color:var(--muted);font-size:12.5px;margin:0 0 18px}
+label{display:block;font-size:12.5px;color:var(--muted);margin:13px 0 5px}
+input{width:100%;padding:12px;border-radius:11px;border:1px solid var(--line);
+  background:#061A17;color:var(--ink);font-size:15px;font-family:inherit}
+.btn{width:100%;margin-top:20px;background:linear-gradient(140deg,#E8C57C,#C9A24D);
+  color:#08201D;border:0;border-radius:12px;padding:14px;font-size:16px;
+  font-weight:700;cursor:pointer;font-family:inherit}
+.ghost{background:none;border:1px solid var(--line);color:var(--muted);
+  border-radius:11px;padding:11px 16px;font-size:14px;cursor:pointer;font-family:inherit}
+.err{background:#38191C;color:#FFB9BD;border:1px solid #6A2830;
+  padding:11px;border-radius:11px;margin-top:14px;font-size:13px}
+.foot{text-align:center;padding:6px 16px 34px}
+.skl{height:78px;border-radius:15px;background:linear-gradient(90deg,
+  var(--card) 25%,var(--card2) 50%,var(--card) 75%);
+  background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{from{background-position:200% 0}to{background-position:-200% 0}}
+</style>
+</head>
+<body>
+
+<div id="setup" class="setup">
+  <img src="icon-192.png" alt="">
+  <h1>تحليلات قيراطان</h1>
+  <p>تُحفظ هذه البيانات في هذا الجهاز وحده ولا تُرسل لأحد</p>
+  <label>رابط مشروع Supabase</label>
+  <input id="url" placeholder="https://xxxx.supabase.co" dir="ltr" autocomplete="off">
+  <label>مفتاح anon العلني</label>
+  <input id="key" placeholder="eyJhbGciOi…" dir="ltr" autocomplete="off">
+  <label>كلمة سرّ التحليلات</label>
+  <input id="sec" type="password" dir="ltr" autocomplete="off">
+  <button class="btn" onclick="save()">دخول</button>
+  <div id="setupMsg"></div>
+</div>
+
+<div id="app" hidden>
+  <header>
+    <img src="icon-192.png" alt="">
+    <div><h1>التحليلات<small id="stamp">…</small></h1></div>
+    <button onclick="load()" title="تحديث">⟳</button>
+  </header>
+  <main id="out"></main>
+  <div class="foot"><button class="ghost" onclick="forget()">تغيير بيانات الدخول</button></div>
+</div>
+
+<script>
+const $=i=>document.getElementById(i), LS='qiratan-analytics';
+const AR=n=>(n===null||n===undefined)?'—':String(n).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const pct=(a,b)=>b?Math.round(100*a/b):null;
+let CFG=null;
+
+function save(){
+  const c={url:$('url').value.trim().replace(/\/+$/,''),key:$('key').value.trim(),sec:$('sec').value};
+  if(!c.url||!c.key||!c.sec){$('setupMsg').innerHTML='<div class="err">املأ الحقول الثلاثة</div>';return;}
+  try{localStorage.setItem(LS,JSON.stringify(c));}catch(e){}
+  boot(c);
+}
+function forget(){try{localStorage.removeItem(LS);}catch(e){} location.reload();}
+function boot(c){CFG=c;$('setup').hidden=true;$('setup').style.display='none';$('app').hidden=false;load();}
+
+async function load(){
+  $('out').innerHTML='<div class="grid">'+'<div class="skl"></div>'.repeat(6)+'</div>';
+  try{
+    const r=await fetch(CFG.url+'/rest/v1/rpc/analytics_snapshot',{
+      method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.key,
+      Authorization:'Bearer '+CFG.key},body:JSON.stringify({p_secret:CFG.sec})});
+    const t=await r.text();
+    if(!r.ok){let m=t;try{m=JSON.parse(t).message||t;}catch(e){}
+      $('out').innerHTML='<div class="err">تعذّر الجلب: '+m+'</div>';return;}
+    render(JSON.parse(t));
+  }catch(e){
+    $('out').innerHTML='<div class="err">تعذّر الاتصال بالخادم.<br>'+e.message+'</div>';
+  }
+}
+
+const C=(n,l,h,cls)=>`<div class="c ${cls||''}"><div class="n">${n}</div>
+  <div class="l">${l}</div>${h?`<div class="h">${h}</div>`:''}</div>`;
+const H=(t,why)=>`<h2><i class="bar"></i>${t}</h2><p class="why">${why}</p>`;
+
+function chart(rows,keys,colors,labels){
+  const W=720,Hh=200,P=30,B=24;
+  const max=Math.max(1,...rows.flatMap(r=>keys.map(k=>+r[k]||0)));
+  const x=i=>P+i*(W-2*P)/Math.max(1,rows.length-1), y=v=>Hh-B-(v/max)*(Hh-B-P);
+  let s=`<svg viewBox="0 0 ${W} ${Hh}">`;
+  s+=`<defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${colors[2]}" stop-opacity=".28"/>
+      <stop offset="1" stop-color="${colors[2]}" stop-opacity="0"/></linearGradient></defs>`;
+  for(let g=0;g<=3;g++){const yy=P+g*(Hh-B-P)/3;
+    s+=`<line x1="${P}" y1="${yy}" x2="${W-P}" y2="${yy}" stroke="#173F39"/>`;}
+  s+=`<text x="${W-P+3}" y="${P+4}" fill="#8DAEA7" font-size="10">${AR(max)}</text>`;
+  // مساحة تحت خطّ النوايا
+  const kk=keys[2];
+  s+=`<path d="M${x(0)},${Hh-B} `+rows.map((r,i)=>`L${x(i)},${y(+r[kk]||0)}`).join(' ')+
+     ` L${x(rows.length-1)},${Hh-B} Z" fill="url(#fade)"/>`;
+  keys.forEach((k,ki)=>{
+    s+=`<polyline points="${rows.map((r,i)=>`${x(i)},${y(+r[k]||0)}`).join(' ')}"
+        fill="none" stroke="${colors[ki]}" stroke-width="2.2"
+        stroke-linejoin="round" stroke-linecap="round"/>`;
+  });
+  rows.forEach((r,i)=>{if(i%7===0||i===rows.length-1)
+    s+=`<text x="${x(i)}" y="${Hh-6}" fill="#6E938C" font-size="9.5"
+        text-anchor="middle">${AR(r.day.slice(5).replace('-','/'))}</text>`;});
+  s+='</svg>';
+  return `<div class="chart">${s}</div><div class="keys" style="margin-top:9px">`+
+    keys.map((k,i)=>`<span><i class="dot" style="background:${colors[i]}"></i>${labels[i]}</span>`)
+    .join('')+'</div>';
+}
+
+function render(d){
+  const p=d.pulse,im=d.impact,sp=d.speed;
+  $('stamp').textContent='حُدِّثت '+new Date(d.generated_at).toLocaleString('ar-EG',
+    {hour:'2-digit',minute:'2-digit',day:'numeric',month:'numeric'});
+  const per=im.verified?im.intent_prayer/im.verified:0;
+  const ret=pct(p.returned,p.cohort), vr=pct(im.verified,im.total);
+  let h='';
+
+  /* الحكم */
+  h+='<section>'+H('الحكم','ثلاثة أرقام تكفي للجواب: هل ينتفع الناس؟')+'<div class="grid">';
+  h+=`<div class="c hero"><div class="n">${AR(per.toFixed(1))}</div>
+    <div class="l">شخص ينوي الحضور — لكل نداء وصل الناس</div>
+    <div class="h">${per>=3?'<b style="color:var(--ok)">التطبيق يُخرج الناس فعلاً</b>'
+      :per>=1?'<b style="color:var(--warn)">يعمل، والاستجابة متوسّطة</b>'
+      :'<b style="color:var(--bad)">الإشعارات تصل ولا أحد يستجيب</b>'}</div></div>`;
+  h+=C(AR(im.without_intent),'نداءات أيقظت الناس بلا استجابة',
+    im.without_intent>im.with_intent?'أكثرها بلا أثر':'الأغلب يُستجاب له',
+    im.without_intent>im.with_intent?'bad':'ok');
+  h+=C(AR(sp.too_late||0),'وُثِّقت بعد فوات الصلاة',
+    sp.too_late?'وصلت متأخّرة — أخطر عطل':'لم يفت أحد بسبب البطء',
+    sp.too_late?'bad':'ok');
+  h+='</div></section>';
+
+  /* الناس */
+  h+='<section>'+H('الناس','«نشط» = فتح التطبيق. ومن يتصفّح بلا تسجيل لا يظهر هنا — عدده في Play Console.')+'<div class="grid">';
+  h+=C(AR(p.users),'مستخدمون مسجّلون','كل من سجّل دخوله يوماً','blue');
+  h+=C(AR(p.active_24h),'نشط خلال ٢٤ ساعة','','ok');
+  h+=C(AR(p.active_7d),'نشط خلال أسبوع','','ok');
+  h+=C(AR(p.new_7d),'تسجيلات هذا الأسبوع','+'+AR(p.new_30d)+' خلال شهر','violet');
+  h+=C(ret===null?'—':AR(ret)+'٪','يعودون بعد أسبوع',
+    ret===null?'لا بيانات كافية':ret>=40?'ممتاز':ret>=20?'مقبول':'يحمّلون ولا يعودون',
+    ret===null?'':ret>=40?'ok':ret>=20?'warn':'bad');
+  h+=C(AR(p.mosques),'حسابات مساجد',p.mosques?'':'وثّق أئمة — نشرهم يمرّ فوراً','rose');
+  h+='</div></section>';
+
+  /* النداءات */
+  h+='<section>'+H('النداءات','«موثّق» = انطلق الإشعار للهواتف. وما دونه ظهر داخل التطبيق فقط.');
+  if(im.total){
+    const w=n=>(100*n/im.total).toFixed(1)+'%';
+    h+=`<div class="stack">
+      <i style="width:${w(im.verified)};background:var(--ok)"></i>
+      <i style="width:${w(im.pending)};background:var(--warn)"></i>
+      <i style="width:${w(im.rejected)};background:var(--bad)"></i></div>
+      <div class="keys" style="margin-bottom:12px">
+      <span><i class="dot" style="background:var(--ok)"></i>موثّقة <b>${AR(im.verified)}</b></span>
+      <span><i class="dot" style="background:var(--warn)"></i>تنتظر تأكيداً <b>${AR(im.pending)}</b></span>
+      <span><i class="dot" style="background:var(--bad)"></i>أُوقفت <b>${AR(im.rejected)}</b></span>
+      </div>`;
+  }
+  h+='<div class="grid">';
+  h+=C(AR(im.total),'كل النداءات');
+  h+=C(vr===null?'—':AR(vr)+'٪','نسبة التوثيق','',vr>=60?'ok':vr>=30?'warn':'bad');
+  h+=C(AR(im.intent_prayer),'نوايا حضور الصلاة','قيراط','ok');
+  h+=C(AR(im.intent_burial),'نوايا حتى الدفن','قيراطان','violet');
+  h+=C(sp.avg_min===null?'—':AR(sp.avg_min)+' د','متوسّط زمن التوثيق',
+    'من النشر حتى انطلاق الإشعار',
+    sp.avg_min===null?'':sp.avg_min<=20?'ok':sp.avg_min<=45?'warn':'bad');
+  h+=C(AR(im.with_hint),'نداءات فيها دلالة مكان','من '+AR(im.total),'blue');
+  h+='</div></section>';
+
+  /* الرسم */
+  h+='<section>'+H('آخر ٣٠ يوماً','الخطّ الذي يهمّك هو نوايا الحضور: صعوده نفعٌ لا حجم.')+
+     chart(d.daily,['funerals','verified','intents','signups'],
+       ['#E8C57C','#43C08A','#5FB8DC','#9E8CE0'],
+       ['نداءات','موثّقة','نوايا حضور','تسجيلات'])+'</section>';
+
+  /* المناطق */
+  h+='<section>'+H('أين يعمل التطبيق','كل «منطقة» مربّع نحو ٥×٥ كم.');
+  const mx=Math.max(1,...d.areas.map(a=>a.funerals));
+  h+='<div class="wrap"><table><tr><th>المنطقة</th><th>نداءات</th><th></th><th>موثّقة</th><th>نوايا</th></tr>';
+  h+=d.areas.length?d.areas.map(a=>`<tr><td dir="ltr">${a.cell}</td><td>${AR(a.funerals)}</td>
+      <td><div class="mini"><i style="width:${100*a.funerals/mx}%"></i></div></td>
+      <td>${AR(a.verified)}</td><td>${AR(a.intents)}</td></tr>`).join('')
+    :'<tr><td colspan="5" style="color:var(--muted)">لا نداءات بعد</td></tr>';
+  h+='</table></div>';
+  h+=`<div class="note ${d.areas.length<=2?'':'ok'}">مناطق نشطة: <b>${AR(d.areas.length)}</b>${
+    d.areas.length<=2?' — التطبيق ما زال محلّياً في حيّك.':' — بدأ ينتشر.'}</div></section>`;
+
+  /* الناشرون */
+  const NM={mosque:'حساب مسجد',trusted:'ناشر موثوق',normal:'مستخدم عادي'};
+  h+='<section>'+H('من يحمل التطبيق','اعتماده على ناشر واحد خطرٌ صامت: إن انقطع توقّف كل شيء.')+
+     '<div class="wrap"><table><tr><th>الدرجة</th><th>ناشرون</th><th>نداءات</th><th>موثّقة</th></tr>';
+  h+=d.publishers.length?d.publishers.map(x=>`<tr><td>${NM[x.level]||x.level}</td>
+      <td>${AR(x.people)}</td><td>${AR(x.funerals)}</td><td>${AR(x.verified)}</td></tr>`).join('')
+    :'<tr><td colspan="4" style="color:var(--muted)">لا ناشرين بعد</td></tr>';
+  h+='</table></div></section>';
+
+  /* الإشعارات */
+  h+='<section>'+H('مسار الإشعارات','«قبِلها الخادم» هو الرقم الصادق — وما دونه يعني أن الطلب غادر فقط.')+
+     '<div class="wrap"><table><tr><th>النوع</th><th>محاولات</th><th>قبِلها الخادم</th><th>رفضها</th></tr>';
+  h+=d.push.length?d.push.map(x=>`<tr><td>${x.type==='verified'?'نداء موثّق':'طلب تأكيد'}</td>
+      <td>${AR(x.tries)}</td><td style="color:var(--ok)">${AR(x.accepted)}</td>
+      <td style="color:${x.refused?'var(--bad)':'inherit'}">${AR(x.refused)}</td></tr>`).join('')
+    :'<tr><td colspan="4" style="color:var(--muted)">لا محاولات خلال ٣٠ يوماً</td></tr>';
+  h+='</table></div></section>';
+
+  /* السعة */
+  const mb=d.storage.db_bytes/1048576, cap=500, use=100*mb/cap;
+  h+='<section>'+H('السعة والجودة','الخطّة المجانية نحو ٥٠٠ ميجابايت — ترقَّ قبل الامتلاء لا بعده.')+
+     `<div class="stack"><i style="width:${Math.min(100,use)}%;background:${
+       use>80?'var(--bad)':use>50?'var(--warn)':'var(--ok)'}"></i></div>
+      <div class="keys" style="margin-bottom:12px"><span>مستعمَل
+      <b>${AR(mb.toFixed(1))} م.ب</b> من ٥٠٠</span></div><div class="grid">`;
+  h+=C(AR(Math.round(use))+'٪','من سعة الخطّة المجانية','',use>80?'bad':use>50?'warn':'ok');
+  h+=C(AR(d.quality.reports),'بلاغات','','warn');
+  h+=C(AR(d.quality.stopped),'نداءات أُوقفت ببلاغات','',d.quality.stopped?'bad':'');
+  h+='</div></section>';
+
+  $('out').innerHTML=h;
+}
+
+try{const s=localStorage.getItem(LS); if(s) boot(JSON.parse(s));}catch(e){}
+if('serviceWorker' in navigator)
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
